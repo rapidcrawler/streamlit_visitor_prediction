@@ -20,10 +20,11 @@ with open(artifact_path+'linear_model.pkl', 'rb') as file:
 st.title("Overnight Visitors Prediction")
 
 # Sidebar for inputs
-st.sidebar.header("Input Parameters")
 
 # Display the logo at the top of the sidebar
 st.sidebar.image("https://uaerg.ae/wp-content/uploads/2022/10/det-report-logos.png", width=250)
+
+st.sidebar.header("DET - Overnight Visitors Prediction")
 
 # Pre-filled random values for demonstration
 year = st.sidebar.selectbox('Year', list(range(2020, 2025)), index=2)
