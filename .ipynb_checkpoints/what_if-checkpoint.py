@@ -85,7 +85,7 @@ with tab2:
 
     for i, col in enumerate([col1, col2, col3], start=1):
         with col:
-            st.subheader(f"Sub-section {i}")
+            st.subheader(f"Source Market {i}")
 
             # Dropdowns for Year, Month, and Nationality
             year = st.selectbox(f'Year', list(range(2020, 2025)), index=i-1, key=f'year{i}')
