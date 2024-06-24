@@ -4,6 +4,7 @@ import numpy as np
 import shap
 import matplotlib.pyplot as plt
 import pickle
+from datetime import datetime, timedelta
 
 # Load the trained model from the pickle file
 artifact_path = './artifacts/'
@@ -50,49 +51,67 @@ with tab1:
     # Input: Average ticket price for business class
     business_ticket_price = st.sidebar.number_input('Average Business Ticket Price', min_value=0, value=2000)
 
-    # Input: Number of bookings in last 3 months, last 2 months, last month
-    bookings_last_3_months = st.sidebar.number_input('Number of Bookings in last 3 months', min_value=0, value=1000)
-    bookings_last_2_months = st.sidebar.number_input('Number of Bookings in last 2 months', min_value=0, value=800)
-    bookings_last_month = st.sidebar.number_input('Number of Bookings in last month', min_value=0, value=500)
+    # Other features (simulated)
+    international_arrivals = st.sidebar.number_input('International Arrivals', min_value=0, value=100000)
+    events = st.sidebar.number_input('Events in Dubai', min_value=0, value=10)
+    weather_conditions = st.sidebar.selectbox('Weather Conditions', ['Sunny', 'Rainy', 'Cloudy', 'Stormy'], index=0)
+    dubai_hotel_occupancy = st.sidebar.slider('Dubai Hotel Occupancy Rate (%)', min_value=0, max_value=100, value=75)
+    dubai_mall_visitors = st.sidebar.number_input('Dubai Mall Visitors', min_value=0, value=50000)
+    dubai_expo_visitors = st.sidebar.number_input('Dubai Expo Visitors', min_value=0, value=20000)
+    exchange_rate = st.sidebar.number_input('Exchange Rate (to USD)', min_value=0.0, value=3.67)
+    marketing_spend = st.sidebar.number_input('Marketing Spend (USD)', min_value=0, value=100000)
+    google_trends_index = st.sidebar.slider('Google Trends Index', min_value=0, max_value=100, value=50)
+    dubai_safety_index = st.sidebar.slider('Dubai Safety Index', min_value=0, max_value=100, value=90)
 
-    # Predict button
-    if st.sidebar.button('Predict'):
-        # Combine inputs into a single array
-        inputs = np.array([year, month_numeric, nationality_encoded, economy_ticket_price, business_ticket_price,
-                   bookings_last_3_months, bookings_last_2_months, bookings_last_month, 0, 0, 0, 0, 0], dtype=float)
-        inputs_log = np.log(inputs + 1)  # Add 1 to avoid log(0)
+    # Prepare the input features
+    features = [
+        year, month_numeric, nationality_encoded, economy_ticket_price, business_ticket_price,
+        international_arrivals, events, weather_conditions, dubai_hotel_occupancy, dubai_mall_visitors,
+        dubai_expo_visitors, exchange_rate, marketing_spend, google_trends_index, dubai_safety_index
+    ]
 
-        # Perform the prediction
-        prediction_log = model.predict(inputs_log.reshape(1, -1))
-        prediction = np.exp(prediction_log)  # Reverse log transformation
+    inputs = np.array(features).reshape(1, -1)
 
-        # Display the prediction result with a subtle success message
-        st.success(f"Predicted Number of Overnight Visitors from {nationality}, for {month} {year}: {int(prediction[0])}")
+    # Normalize and apply log transformation to inputs
+    inputs_log = np.log(inputs + 1)  # Add 1 to avoid log(0)
 
-        # Explain the model's predictions using SHAP
-        explainer = shap.Explainer(model, np.log(np.zeros((1, 13)) + 1))
+    # Perform the prediction
+    prediction_log = model.predict(inputs_log.reshape(1, -1))
+    prediction = np.exp(prediction_log)  # Reverse log transformation
 
-        shap_values = explainer(inputs_log.reshape(1, -1))
+    # Display the prediction result with a subtle success message
+    st.success(f"Predicted Number of Overnight Visitors from {nationality}, for {month} {year}: {int(prediction[0])}")
 
-        st.subheader("SHAP Waterfall Plot")
-        plt.figure(figsize=(10, 6))
-        shap.waterfall_plot(shap_values[0])
-        st.pyplot(plt)
+    # Explain the model's predictions using SHAP
+    explainer = shap.Explainer(model, np.log(np.zeros((1, 13)) + 1))
+
+    shap_values = explainer(inputs_log.reshape(1, -1))
+
+    st.subheader("SHAP Waterfall Plot")
+    plt.figure(figsize=(10, 6))
+    shap.waterfall_plot(shap_values[0])
+    st.pyplot(plt)
 
 with tab2:
+    # Calculate the next month and year
+    today = datetime.today()
+    next_month = today + timedelta(days=30)
+    default_year = next_month.year
+    default_month_index = next_month.month - 1
+
     # Create three columns for the sub-sections
     col1, col2, col3 = st.columns(3)
 
     for i, col in enumerate([col1, col2, col3], start=1):
         with col:
-            st.subheader(f"Scenario {i}")
+            st.subheader(f"Source Market {i}")
 
             # Dropdowns for Year, Month, and Nationality
-            year = st.selectbox(f'Year', list(range(2020, 2025)), index=i-1, key=f'year{i}')
+            year = st.selectbox(f'Year', list(range(2020, 2025)), index=default_year-2020, key=f'year{i}')
             month = st.selectbox(f'Month', [
                 'January', 'February', 'March', 'April', 'May', 'June',
                 'July', 'August', 'September', 'October', 'November', 'December'
-            ], index=(i-1) % 12, key=f'month{i}')
+            ], index=default_month_index, key=f'month{i}')
             nationality = st.selectbox(f'Nationality', ['USA', 'UK', 'India', 'China', 'Germany'], index=(i-1) % 5, key=f'nationality{i}')
 
             # Simulate visitor count (replace with actual calculation if available)
