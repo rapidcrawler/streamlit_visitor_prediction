@@ -99,19 +99,19 @@ with tab2:
             st.subheader(f"Scenario {i}")
             
             # Dropdowns for Year, Month, and Nationality
-            year = st.selectbox(f'Year', list(range(2020, 2026)), index=i-1, key=f'year{i}')
+            year = st.selectbox(f'Year', list(range(2020, 2026)), index=i-1, key=f'year{i}')            
             month = st.selectbox(f'Month', 
                 ['January', 'February', 'March', 'April', 'May', 'June',
-                 'July', 'August', 'September', 'October', 'November', 'December'], index=(i-1) % 12, key=f'month{i}')
-            nationality = st.selectbox(f'Nationality', ['USA', 'UK', 'India', 'China', 'Germany'], index=(i-1) % 5, key=f'nationality{i}')
+                 'July', 'August', 'September', 'October', 'November', 'December'], index=(i-1) % 12, key=f'month{i}').lower()
+            nationality = st.selectbox(f'Nationality', ['USA', 'UK', 'India', 'China', 'Germany'], index=(i-1) % 5, key=f'nationality{i}').lower()
             
             # Debugging statements
-            st.write(f"Selected Year: {year}")
-            st.write(f"Selected Month: {month}")
-            st.write(f"Selected Nationality: {nationality}")
+            # st.write(f"Selected Year: {year}")
+            # st.write(f"Selected Month: {month}")
+            # st.write(f"Selected Nationality: {nationality}")
 
             # Fetch the visitor count from the DataFrame based on selected values
-            filtered_df = predictions_df[
+            filtered_df = predictions_df.loc[
                 (predictions_df['Year'] == year) & 
                 (predictions_df['Month'] == month) & 
                 (predictions_df['Nationality'] == nationality)
