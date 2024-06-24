@@ -15,9 +15,18 @@ with open(artifact_path + 'linear_model.pkl', 'rb') as file:
 st.title("Overnight Visitors Prediction")
 
 # Define tabs
-what_if_tab1, monthl_pred_tab2 = st.tabs(["What-If", "Monthly Predictions"])
+tab1, monthly_preds_tab2 = st.tabs(["What-If", "Monthly Predictions"])
 
-with what_if_tab1:
+# Pre-filled random values for demonstration
+# year_list = list(range(dt.now().year, 2025))
+# month_list = [
+#     'January', 'February', 'March', 'April', 'May', 'June',
+#     'July', 'August', 'September', 'October', 'November', 'December'
+# ]
+# nationality_list = ['USA', 'UK', 'India', 'China', 'Germany']
+
+
+with tab1:
     # Sidebar for inputs
 
     # Display the logo at the top of the sidebar
@@ -26,11 +35,11 @@ with what_if_tab1:
     st.sidebar.header("DET - Overnight Visitors Prediction")
 
     # Pre-filled random values for demonstration
-    year = st.sidebar.selectbox('Year', list(range(2020, 2025)), index=2)
+    year = st.sidebar.selectbox('Year', list(range(dt.now().year, 2026)), index=1)
     month = st.sidebar.selectbox('Month', [
         'January', 'February', 'March', 'April', 'May', 'June',
         'July', 'August', 'September', 'October', 'November', 'December'
-    ], index=5)
+    ], index=dt.now().month)
     nationality = st.sidebar.selectbox('Nationality', ['USA', 'UK', 'India', 'China', 'Germany'], index=1)
 
     # Encoding nationality as a numeric value
@@ -79,70 +88,50 @@ with what_if_tab1:
         plt.figure(figsize=(10, 6))
         shap.waterfall_plot(shap_values[0])
         st.pyplot(plt)
-
-with monthl_pred_tab2:
-    # Load the predictions data
-    predictions_df = pd.read_csv(artifact_path+'onv_preds.csv')
+        
+with monthly_preds_tab2:
+    # Define the predictions DataFrame for demonstration purposes
+    predictions_df = pd.read_csv(artifact_path+"onv_preds.csv")
     
-    # Ensure the data types of the DataFrame match the selections
-    predictions_df['Year'] = predictions_df['Year'].astype(int)
-    predictions_df['Month'] = predictions_df['Month'].astype(str)
-    predictions_df['Nationality'] = predictions_df['Nationality'].astype(str)
-    
-    # Print the DataFrame to check its contents
-    # st.write("DataFrame contents:")
-    # st.write(predictions_df.tail())
+    col1, col2, col3 = st.columns(3)
 
-    # Loop for creating scenarios
-col1, col2, col3 = st.columns(3)
+    for i, col in enumerate([col1, col2, col3], start=1):
+        with col:
+            st.subheader(f"Scenario {i}")
 
-for i, col in enumerate([col1, col2, col3], start=1):
-    with col:
-        st.subheader(f"Scenario {i}")
-        
-        # Dropdowns for Year, Month, and Nationality
-        from_year = dt.now().year
-        to_year = max(predictions_df['Year'])
-        year_range = list(range(from_year, to_year + 1))
-        
-        # Adjust the index to be within valid range
-        year_index = max(0, min(len(year_range) - 1, i - 1))
-        year = st.selectbox(f'Year', year_range, index=year_index, key=f'year{i}')
-        
-        month_index = (i - 1) % 12
-        month = st.selectbox(f'Month', 
-            ['January', 'February', 'March', 'April', 'May', 'June',
-             'July', 'August', 'September', 'October', 'November', 'December'], 
-            index=month_index, key=f'month{i}').lower()
-        
-        nationality_index = (i - 1) % 5
-        nationality = st.selectbox(f'Nationality', ['USA', 'UK', 'India', 'China', 'Germany'], 
-            index=nationality_index, key=f'nationality{i}').lower()
+            from_year = dt.now().year
+            to_year = max(predictions_df['Year'])
+            year_range = list(range(from_year, to_year + 1))
 
-        # Debugging statements
-        # st.write(f"Selected Year: {year}")
-        # st.write(f"Selected Month: {month}")
-        # st.write(f"Selected Nationality: {nationality}")
+            year_index = max(0, min(len(year_range) - 1, i - 1))
+            year = st.selectbox(f'Year', year_range, index=year_index, key=f'year{i}')
 
-        # Fetch the visitor count from the DataFrame based on selected values
-        filtered_df = predictions_df.loc[
-            (predictions_df['Year'] == year) & 
-            (predictions_df['Month'] == month) & 
-            (predictions_df['Nationality'] == nationality)
-        ]
+            month_index = (i - 1) % 12
+            month = st.selectbox(f'Month',
+                ['January', 'February', 'March', 'April', 'May', 'June',
+                 'July', 'August', 'September', 'October', 'November', 'December'],
+                index=month_index, key=f'month{i}').lower()
 
-        # Debugging: print the filtered DataFrame
-        st.write("Filtered DataFrame:")
-        st.write(filtered_df)
+            nationality_index = (i - 1) % 5
+            nationality = st.selectbox(f'Nationality', ['USA', 'UK', 'India', 'China', 'Germany'],
+                index=nationality_index, key=f'nationality{i}').lower()
 
-        if not filtered_df.empty:
-            visitor_count = filtered_df['ONV Predictions'].values[0]
-        else:
-            visitor_count = "Data not available"
-        
-        # Display the visitor count in a highlighted cell box
-        st.markdown(f"""
-            <div>
-                <p>ONV Count: {visitor_count}</p>
-            </div>
-        """, unsafe_allow_html=True)
+            filtered_df = predictions_df.loc[
+                (predictions_df['Year'] == year) &
+                (predictions_df['Month'] == month) &
+                (predictions_df['Nationality'] == nationality)
+            ]
+
+            st.write("Filtered DataFrame:")
+            st.write(filtered_df)
+
+            if not filtered_df.empty:
+                visitor_count = filtered_df['ONV Predictions'].values[0]
+            else:
+                visitor_count = "Data not available"
+
+            st.markdown(f"""
+                <div>
+                    <p>ONV Count: {visitor_count}</p>
+                </div>
+            """, unsafe_allow_html=True)
