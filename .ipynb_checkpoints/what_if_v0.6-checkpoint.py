@@ -10,6 +10,10 @@ from PIL import Image
 import base64
 
 # Load the trained model from the pickle file
+
+st.set_page_config(page_title="DET ONV - What-If", page_icon="https://cdn-icons-png.freepik.com/512/5632/5632376.png", layout="centered", initial_sidebar_state="auto", menu_items=None)
+
+
 artifact_path = './artifacts/'
 with open(artifact_path + 'linear_model.pkl', 'rb') as file:
     model = pickle.load(file)
@@ -128,7 +132,10 @@ with monthly_preds_tab2:
             f'<div><img src="data:image/png;base64,{img_base64}" class="img-magnify"></div>',
             unsafe_allow_html=True
         )
-    
+    col1, col2, col3 = st.columns(3)
+    col1.metric("MAPE", "82/100", "12%")
+    col2.metric("R2", "0.9/1.0", "-0.02")
+    col3.metric("EVS", "86/100", "4%")
     col1, col2, col3 = st.columns(3)
 
     for i, col in enumerate([col1, col2, col3], start=1):
@@ -158,12 +165,14 @@ with monthly_preds_tab2:
                 (predictions_df['Nationality'] == nationality)
             ]
 
-            st.write("Filtered DataFrame:")
-            st.write(f"Year: {year}"); 
-            st.write(f"Month: {month}"); 
-            st.write(f"Nationality: {nationality}"); 
-            st.write(filtered_df)
+            # Button to display data as per drow-down filters
+            if st.button("Show Data", key=f'show_data_{i}'):
+                st.write("Filtered DataFrame:")
+                st.write(filtered_df)
+            # Button to hide data
+            st.button("Reset", type="primary", key=f'reset_{i}')
 
+            # Determining predicted ONV from the excel file
             if not filtered_df.empty:
                 visitor_count = filtered_df['ONV Predictions'].values[0]
             else:
@@ -176,4 +185,4 @@ with monthly_preds_tab2:
             """, unsafe_allow_html=True)
             # Display the SHAP waterfall image based on the selections
             display_shap_waterfall(year, month, nationality)
-        
+            st.write(f"{month.capitalize()}/{year} for {nationality.capitalize()}"); 
