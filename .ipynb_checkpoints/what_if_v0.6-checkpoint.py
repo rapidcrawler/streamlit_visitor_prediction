@@ -91,9 +91,19 @@ with tab1:
 
         shap_values = explainer(inputs_log.reshape(1, -1))
 
+        # Display SHAP Waterfall Plot with feature names
         st.subheader("SHAP Waterfall Plot")
+        feature_names = [
+            'Year', 'Month', 'Nationality', 'Economy Ticket Price', 'Business Ticket Price',
+            'Bookings Last 3 Months', 'Bookings Last 2 Months', 'Bookings Last Month',
+            'Feature9', 'Feature10', 'Feature11', 'Feature12', 'Feature13'
+        ]
+        
+        # Create a new SHAP explanation object with the feature names
+        shap_values_with_names = shap.Explanation(values=shap_values.values, base_values=shap_values.base_values, data=shap_values.data, feature_names=feature_names)
+        
         plt.figure(figsize=(10, 6))
-        shap.waterfall_plot(shap_values[0])
+        shap.waterfall_plot(shap_values_with_names[0])
         st.pyplot(plt)
         
 with monthly_preds_tab2:
@@ -132,7 +142,7 @@ with monthly_preds_tab2:
             f'<div><img src="data:image/png;base64,{img_base64}" class="img-magnify"></div>',
             unsafe_allow_html=True
         )
-    col1, col2, col3 = st.columns(3)
+    col1, col2, col3 = st.columns(3) 
     col1.metric("MAPE", "82/100", "12%")
     col2.metric("R2", "0.9/1.0", "-0.02")
     col3.metric("EVS", "86/100", "4%")
