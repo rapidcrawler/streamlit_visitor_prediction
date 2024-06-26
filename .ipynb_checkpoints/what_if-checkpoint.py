@@ -132,7 +132,7 @@ with monthly_preds_tab2:
             f'<div><img src="data:image/png;base64,{img_base64}" class="img-magnify"></div>',
             unsafe_allow_html=True
         )
-    col1, col2, col3 = st.columns(3)
+    col1, col2, col3 = st.columns(3) 
     col1.metric("MAPE", "82/100", "12%")
     col2.metric("R2", "0.9/1.0", "-0.02")
     col3.metric("EVS", "86/100", "4%")
