@@ -5,6 +5,9 @@ import shap
 import matplotlib.pyplot as plt
 import pickle
 from datetime import datetime as dt
+import os
+from PIL import Image
+import base64
 
 # Load the trained model from the pickle file
 artifact_path = './artifacts/'
@@ -92,6 +95,39 @@ with tab1:
 with monthly_preds_tab2:
     # Define the predictions DataFrame for demonstration purposes
     predictions_df = pd.read_csv(artifact_path+"onv_preds.csv")
+
+    
+    # Define CSS for image magnification
+    st.markdown(
+        """
+        <style>
+        .img-magnify {
+            transition: transform 0.8s;
+            width: 150px;
+        }
+        .img-magnify:hover {
+            transform: scale(5);
+            z-index: 1000;
+            position: relative;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
+    # Define a function to convert image to base64
+    def get_image_base64(image_path):
+        with open(image_path, "rb") as image_file:
+            return base64.b64encode(image_file.read()).decode()
+    
+    # Define a function to display the SHAP waterfall image based on the dropdown selections
+    def display_shap_waterfall(year, month, nationality):        
+        image_path = os.path.join(artifact_path, "shap_plots", f"SHAP_Waterfall_{year}_{month}_{nationality}.png")        
+        img_base64 = get_image_base64(image_path)
+        st.markdown(
+            f'<div><img src="data:image/png;base64,{img_base64}" class="img-magnify"></div>',
+            unsafe_allow_html=True
+        )
     
     col1, col2, col3 = st.columns(3)
 
@@ -123,6 +159,9 @@ with monthly_preds_tab2:
             ]
 
             st.write("Filtered DataFrame:")
+            st.write(f"Year: {year}"); 
+            st.write(f"Month: {month}"); 
+            st.write(f"Nationality: {nationality}"); 
             st.write(filtered_df)
 
             if not filtered_df.empty:
@@ -135,3 +174,6 @@ with monthly_preds_tab2:
                     <p>ONV Count: {visitor_count}</p>
                 </div>
             """, unsafe_allow_html=True)
+            # Display the SHAP waterfall image based on the selections
+            display_shap_waterfall(year, month, nationality)
+        
