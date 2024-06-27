@@ -22,24 +22,17 @@ with open(artifact_path + 'linear_model.pkl', 'rb') as file:
 st.title("Overnight Visitors Prediction")
 
 # Define tabs
-tab1, monthly_preds_tab2 = st.tabs(["What-If", "Monthly Predictions"])
-
-# Pre-filled random values for demonstration
-# year_list = list(range(dt.now().year, 2025))
-# month_list = [
-#     'January', 'February', 'March', 'April', 'May', 'June',
-#     'July', 'August', 'September', 'October', 'November', 'December'
-# ]
-# nationality_list = ['USA', 'UK', 'India', 'China', 'Germany']
+whatif_tab1, monthly_preds_tab2 = st.tabs(["What-If", "Monthly Predictions"])
 
 
-with tab1:
+with whatif_tab1:
     # Sidebar for inputs
 
     # Display the logo at the top of the sidebar
     st.sidebar.image("https://uaerg.ae/wp-content/uploads/2022/10/det-report-logos.png", width=250)
 
-    st.sidebar.header("DET - Overnight Visitors Prediction")
+    st.sidebar.header("DET - Overnight Visitors Prediction", divider='red')
+    st.sidebar.subheader("What-If Scenario Creators")
 
     # Pre-filled random values for demonstration
     year = st.sidebar.selectbox('Year', list(range(dt.now().year, 2026)), index=1)
