@@ -31,8 +31,10 @@ with whatif_tab1:
     # Display the logo at the top of the sidebar
     st.sidebar.image("https://uaerg.ae/wp-content/uploads/2022/10/det-report-logos.png", width=250)
 
-    # st.sidebar.subheader("DET - Overnight Visitors Prediction", divider='red')
     st.sidebar.header("What-If Scenario Creators :crystal_ball:", divider='red')
+    # More emojis: 
+    # - https://emojidb.org/experiment-emojis
+    # - https://streamlit-emoji-shortcodes-streamlit-app-gwckff.streamlit.app/
 
     # Pre-filled random values for demonstration
     year = st.sidebar.selectbox('Year', list(range(dt.now().year, 2026)), index=1)
@@ -188,4 +190,4 @@ with monthly_preds_tab2:
             """, unsafe_allow_html=True)
             # Display the SHAP waterfall image based on the selections
             display_shap_waterfall(year, month, nationality)
-            st.write(f"{month.capitalize()}/{year} for {nationality.capitalize()}"); 
+            st.write(f"{nationality.upper()} Visitors for {month.capitalize()} - {year}");
