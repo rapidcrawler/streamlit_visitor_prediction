@@ -31,8 +31,8 @@ with whatif_tab1:
     # Display the logo at the top of the sidebar
     st.sidebar.image("https://uaerg.ae/wp-content/uploads/2022/10/det-report-logos.png", width=250)
 
-    st.sidebar.header("DET - Overnight Visitors Prediction", divider='red')
-    st.sidebar.subheader("What-If Scenario Creators")
+    # st.sidebar.subheader("DET - Overnight Visitors Prediction", divider='red')
+    st.sidebar.header("What-If Scenario Creators :crystal_ball:", divider='red')
 
     # Pre-filled random values for demonstration
     year = st.sidebar.selectbox('Year', list(range(dt.now().year, 2026)), index=1)
