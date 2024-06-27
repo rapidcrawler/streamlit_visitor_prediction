@@ -31,7 +31,7 @@ with whatif_tab1:
     # Display the logo at the top of the sidebar
     st.sidebar.image("https://uaerg.ae/wp-content/uploads/2022/10/det-report-logos.png", width=250)
 
-    st.sidebar.header("What-If Scenario Creators :crystal_ball:", divider='red')
+    st.sidebar.header("What-If Scenario Creators", divider='red')
     # More emojis: 
     # - https://emojidb.org/experiment-emojis
     # - https://streamlit-emoji-shortcodes-streamlit-app-gwckff.streamlit.app/
