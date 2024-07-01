@@ -138,9 +138,9 @@ with monthly_preds_tab2:
             unsafe_allow_html=True
         )
     col1, col2, col3 = st.columns(3) 
-    col1.metric("MAPE", "82/100", "12%")
-    col2.metric("R2", "0.9/1.0", "-0.02")
-    col3.metric("EVS", "86/100", "4%")
+    col1.metric("Metric-1", "82/100", "12%")
+    col2.metric("Metric-2", "0.9/1.0", "-0.02")
+    col3.metric("Metric-3", "86/100", "4%")
     col1, col2, col3 = st.columns(3)
 
     for i, col in enumerate([col1, col2, col3], start=1):
