@@ -196,8 +196,10 @@ with monthly_preds_tab2:
 
     
 
+    
+
     # Add a section at the bottom for the line chart
-    st.subheader("Visitor Count Line Chart", divider="red")
+    st.subheader("Visitor Count Line Chart")
     
     # Create a 'Year-Month' column in predictions_df
     if 'Year-Month' not in predictions_df.columns:
@@ -212,14 +214,14 @@ with monthly_preds_tab2:
                         'July', 'August', 'September', 'October', 'November', 'December']
     available_nationalities = predictions_df['Nationality'].unique()
     
-    # Calculate next month
+    # Calculate the next three months
     current_date = datetime.now()
-    next_month = (current_date.month % 12) + 1
-    next_month_name = current_date.replace(month=next_month).strftime('%B')
+    next_three_months = [(current_date.month + i - 1) % 12 + 1 for i in range(1, 4)]
+    next_three_months_names = [current_date.replace(month=month).strftime('%B') for month in next_three_months]
     
     # Sidebar selections for Year, Month, and Nationality
     selected_year = st.selectbox("Select Year", available_years, index=0, key='line_chart_year')
-    selected_months = st.multiselect("Select Month", available_months, default=next_month_name, key='line_chart_months')
+    selected_months = st.multiselect("Select Month", available_months, default=next_three_months_names, key='line_chart_months')
     selected_months_lower = [month.lower() for month in selected_months]
     selected_nationalities = st.multiselect("Select Nationality", available_nationalities, default=available_nationalities[0], key='line_chart_nationalities')
     selected_nationalities_lower = [nat.lower() for nat in selected_nationalities]
