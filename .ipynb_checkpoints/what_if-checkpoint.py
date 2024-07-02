@@ -145,7 +145,7 @@ with monthly_preds_tab2:
 
     for i, col in enumerate([col1, col2, col3], start=1):
         with col:
-            st.subheader(f"Scenario {i}")
+            st.subheader(f"Scenario {i}", divider="red")
 
             from_year = dt.now().year
             to_year = max(predictions_df['Year'])
@@ -191,3 +191,51 @@ with monthly_preds_tab2:
             # Display the SHAP waterfall image based on the selections
             display_shap_waterfall(year, month, nationality)
             st.write(f"{nationality.upper()} Visitors for {month.capitalize()} - {year}");
+
+
+    
+
+    # Add a section at the bottom for the line chart
+    st.subheader("Visitor Count Line Chart", divider="red")
+    
+    # Create a 'Year-Month' column in predictions_df
+    if 'Year-Month' not in predictions_df.columns:
+        predictions_df['Year-Month'] = predictions_df['Year'].astype(str) + '-' + predictions_df['Month'].str.capitalize()
+    
+    # Define available years as current year and next year
+    current_year = dt.now().year
+    available_years = [current_year, current_year + 1]
+    
+    # Get unique values for selection
+    available_months = ['January', 'February', 'March', 'April', 'May', 'June',
+                        'July', 'August', 'September', 'October', 'November', 'December']
+    available_nationalities = predictions_df['Nationality'].unique()
+    
+    # Sidebar selections for Year, Month, and Nationality
+    selected_year = st.selectbox("Select Year", available_years, index=0, key='line_chart_year')
+    selected_months = st.multiselect("Select Month", available_months, default=available_months[0], key='line_chart_months')
+    selected_months_lower = [month.lower() for month in selected_months]
+    selected_nationalities = st.multiselect("Select Nationality", available_nationalities, default=available_nationalities[0], key='line_chart_nationalities')
+    selected_nationalities_lower = [nat.lower() for nat in selected_nationalities]
+    
+    # Filter predictions_df based on selections
+    filtered_df_for_chart = predictions_df[(predictions_df['Year'] == selected_year) &
+                                           (predictions_df['Month'].isin(selected_months_lower)) &
+                                           (predictions_df['Nationality'].isin(selected_nationalities_lower))]
+    
+    if not filtered_df_for_chart.empty:
+        # Create line chart
+        fig, ax = plt.subplots()
+        for nationality in selected_nationalities_lower:
+            nat_df = filtered_df_for_chart[filtered_df_for_chart['Nationality'] == nationality]
+            ax.plot(nat_df['Year-Month'], nat_df['ONV Predictions'], marker='o', label=nationality.capitalize())
+        
+        ax.set_xlabel("Year-Month")
+        ax.set_ylabel("Visitor Count")
+        selected_months_str = ', '.join([month.capitalize() for month in selected_months])
+        ax.set_title(f"ONV Count for upcoming months in - {selected_year}")
+        ax.legend(title="Nationality")
+        
+        st.pyplot(fig)
+    else:
+        st.write("No data available for the selected criteria.")
