@@ -241,7 +241,7 @@ with monthly_preds_tab2:
         ax.set_xlabel("Year-Month")
         ax.set_ylabel("Visitor Count")
         selected_months_str = ', '.join([month.capitalize() for month in selected_months])
-        ax.set_title(f"Visitor Count for Selected Nationalities in {selected_months_str} - {selected_year}")
+        ax.set_title(f"ONV Count For Upcoming Months in {selected_year}")
         ax.legend(title="Nationality")
         
         st.pyplot(fig)
