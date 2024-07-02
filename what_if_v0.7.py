@@ -5,6 +5,7 @@ import shap
 import matplotlib.pyplot as plt
 import pickle
 from datetime import datetime as dt
+from datetime import datetime
 import os
 from PIL import Image
 import base64
@@ -211,9 +212,14 @@ with monthly_preds_tab2:
                         'July', 'August', 'September', 'October', 'November', 'December']
     available_nationalities = predictions_df['Nationality'].unique()
     
+    # Calculate next month
+    current_date = datetime.now()
+    next_month = (current_date.month % 12) + 1
+    next_month_name = current_date.replace(month=next_month).strftime('%B')
+    
     # Sidebar selections for Year, Month, and Nationality
     selected_year = st.selectbox("Select Year", available_years, index=0, key='line_chart_year')
-    selected_months = st.multiselect("Select Month", available_months, default=available_months[0], key='line_chart_months')
+    selected_months = st.multiselect("Select Month", available_months, default=next_month_name, key='line_chart_months')
     selected_months_lower = [month.lower() for month in selected_months]
     selected_nationalities = st.multiselect("Select Nationality", available_nationalities, default=available_nationalities[0], key='line_chart_nationalities')
     selected_nationalities_lower = [nat.lower() for nat in selected_nationalities]
@@ -233,7 +239,7 @@ with monthly_preds_tab2:
         ax.set_xlabel("Year-Month")
         ax.set_ylabel("Visitor Count")
         selected_months_str = ', '.join([month.capitalize() for month in selected_months])
-        ax.set_title(f"ONV Count for upcoming months in - {selected_year}")
+        ax.set_title(f"Visitor Count for Selected Nationalities in {selected_months_str} - {selected_year}")
         ax.legend(title="Nationality")
         
         st.pyplot(fig)
