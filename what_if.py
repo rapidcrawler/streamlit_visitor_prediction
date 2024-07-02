@@ -199,7 +199,7 @@ with monthly_preds_tab2:
     
 
     # Add a section at the bottom for the line chart
-    st.subheader("Visitor Count Line Chart")
+    st.subheader("OVN Count For Upcoming Months")
     
     # Create a 'Year-Month' column in predictions_df
     if 'Year-Month' not in predictions_df.columns:
