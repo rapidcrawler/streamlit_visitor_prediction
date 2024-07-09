@@ -16,7 +16,7 @@ st.set_page_config(page_title="DET ONV - What-If", page_icon="https://cdn-icons-
 
 
 artifact_path = './artifacts/'
-with open(artifact_path + 'linear_model.pkl', 'rb') as file:
+with open(artifact_path + 'random_forest_model.pkl', 'rb') as file:
     model = pickle.load(file)
 
 # Streamlit App with tabs
@@ -27,27 +27,24 @@ whatif_tab1, monthly_preds_tab2 = st.tabs(["What-If", "Monthly Predictions"])
 
 
 with whatif_tab1:
-    # Sidebar for inputs
-
     # Display the logo at the top of the sidebar
     st.sidebar.image("https://uaerg.ae/wp-content/uploads/2022/10/det-report-logos.png", width=250)
-
-    st.sidebar.header("What-If Scenario Creators", divider='red')
-    # More emojis: 
-    # - https://emojidb.org/experiment-emojis
-    # - https://streamlit-emoji-shortcodes-streamlit-app-gwckff.streamlit.app/
-
+    
     # Pre-filled random values for demonstration
+    st.sidebar.header("Essential Statics", divider='red')
     year = st.sidebar.selectbox('Year', list(range(dt.now().year, 2026)), index=1)
+    
     month = st.sidebar.selectbox('Month', [
         'January', 'February', 'March', 'April', 'May', 'June',
         'July', 'August', 'September', 'October', 'November', 'December'
     ], index=dt.now().month)
-    nationality = st.sidebar.selectbox('Nationality', ['USA', 'UK', 'India', 'China', 'Germany'], index=1)
+    num_months = st.sidebar.slider('Number of Months to Predict', min_value=1, max_value=12, value=3, key="num_months_slider")    
+    
+    nationality_string = st.sidebar.selectbox('Nationality', ['USA', 'UK', 'India', 'China', 'Germany'], index=1)
 
     # Encoding nationality as a numeric value
     nationality_dict = {'USA': 1, 'UK': 2, 'India': 3, 'China': 4, 'Germany': 5}
-    nationality_encoded = nationality_dict[nationality]
+    nationality_encoded = nationality_dict[nationality_string]
 
     # Convert month to numeric value
     month_dict = {
@@ -56,51 +53,64 @@ with whatif_tab1:
         'November': 11, 'December': 12
     }
     month_numeric = month_dict[month]
-
+    
+    
+    st.sidebar.header("What-If Scenario Creators", divider='red')
     # Input: Average ticket price for economy class
     economy_ticket_price = st.sidebar.number_input('Average Economy Ticket Price', min_value=0, value=500)
-
+    
     # Input: Average ticket price for business class
     business_ticket_price = st.sidebar.number_input('Average Business Ticket Price', min_value=0, value=2000)
+
+    avg_google_searches = st.sidebar.number_input('Average Google Searches In Previous Months', min_value=0, value=500)
 
     # Input: Number of bookings in last 3 months, last 2 months, last month
     bookings_last_3_months = st.sidebar.number_input('Number of Bookings in last 3 months', min_value=0, value=1000)
     bookings_last_2_months = st.sidebar.number_input('Number of Bookings in last 2 months', min_value=0, value=800)
     bookings_last_month = st.sidebar.number_input('Number of Bookings in last month', min_value=0, value=500)
+    gdp = st.sidebar.number_input('GDP Value ($BN)', min_value=0, value=50)
 
+    
+    test_df = pd.DataFrame([year, month_numeric, nationality_encoded,economy_ticket_price, business_ticket_price, avg_google_searches, bookings_last_3_months, bookings_last_2_months, bookings_last_month, gdp]).T
+    feature_name_list = ["Year", "Month", "Nationality", "Economy Price", "Business Price", "Avg Flight Searches", "Bookings Last 3 Months", "Bookings Last 2 Months", "Bookings Last Month", "G.D.P."]
+    test_df.columns = feature_name_list
+    test_df
+    
+    
     # Predict button
     if st.sidebar.button('Predict'):
-        # Combine inputs into a single array
-        inputs = np.array([year, month_numeric, nationality_encoded, economy_ticket_price, business_ticket_price,
-                   bookings_last_3_months, bookings_last_2_months, bookings_last_month, 0, 0, 0, 0, 0], dtype=float)
-        inputs_log = np.log(inputs + 1)  # Add 1 to avoid log(0)
-
-        # Perform the prediction
-        prediction_log = model.predict(inputs_log.reshape(1, -1))
-        prediction = np.exp(prediction_log)  # Reverse log transformation
-
-        # Display the prediction result with a subtle success message
-        st.success(f"Predicted Number of Overnight Visitors from {nationality}, for {month} {year}: {int(prediction[0])}")
-
-        # Explain the model's predictions using SHAP
-        explainer = shap.Explainer(model, np.log(np.zeros((1, 13)) + 1))
-
-        shap_values = explainer(inputs_log.reshape(1, -1))
-
-        # Display SHAP Waterfall Plot with feature names
         st.subheader("SHAP Waterfall Plot")
-        feature_names = [
-            'Year', 'Month', 'Nationality', 'Economy Ticket Price', 'Business Ticket Price',
-            'Bookings Last 3 Months', 'Bookings Last 2 Months', 'Bookings Last Month',
-            'Feature9', 'Feature10', 'Feature11', 'Feature12', 'Feature13'
-        ]
+
+        for month_sequence in range(num_months):
+            current_month = month_sequence+month_numeric
+            month_name = next((k for k, v in month_dict.items() if v == current_month), None)
+            # st.write(f"For the Month of {month_name}")
+            # st.write("Input Data")
+            # test_df.values
+            test_df['Month'] = month_dict[month_name]
+            X_test = np.log(test_df.values + 1)  # Add 1 to avoid log(0)
+            prediction_log = model.predict(X_test)
+            predicted_onv = np.exp(prediction_log)  # Reverse log transformation
+    
+            st.success(f"Predicted Number of Overnight Visitors from {nationality_string}, for {month_name} {year}: {int(predicted_onv[0])}")
+            st.write(f"Prediction Input Data {month_name} {year}:\n")
+            test_df
+            explainer = shap.TreeExplainer(model)
+            shap_values = explainer(X_test)
+            
+            shap_values_obj = shap.Explanation(values=shap_values.values, base_values=shap_values.base_values, data=shap_values.data
+                                               , feature_names=feature_name_list
+                                              )
+    
+            # Display the waterfall plot for the first instance        
+            fig, ax = plt.subplots()
+            shap.waterfall_plot(shap_values_obj[0])
+            st.pyplot(fig)
+            st.header("", divider='red')
+            st.header("\n\n")            
         
-        # Create a new SHAP explanation object with the feature names
-        shap_values_with_names = shap.Explanation(values=shap_values.values, base_values=shap_values.base_values, data=shap_values.data, feature_names=feature_names)
         
-        plt.figure(figsize=(10, 6))
-        shap.waterfall_plot(shap_values_with_names[0])
-        st.pyplot(plt)
+        
         
 with monthly_preds_tab2:
     # Define the predictions DataFrame for demonstration purposes
@@ -192,13 +202,12 @@ with monthly_preds_tab2:
             # Display the SHAP waterfall image based on the selections
             display_shap_waterfall(year, month, nationality)
             st.write(f"{nationality.upper()} Visitors for {month.capitalize()} - {year}");
-
-
+    # 3 column layout ends here
     
-
-    
-
     # Add a section at the bottom for the line chart
+    st.subheader(" ")
+    st.subheader(" ", divider="red")
+    st.subheader(" ")
     st.subheader("OVN Count For Upcoming Months")
     
     # Create a 'Year-Month' column in predictions_df
