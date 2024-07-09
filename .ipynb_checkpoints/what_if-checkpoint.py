@@ -114,7 +114,7 @@ with whatif_tab1:
         
         
 with monthly_preds_tab2:
-    st.header("Model's Predictions")
+    st.header("Predictive Results")
     # Define the predictions DataFrame for demonstration purposes
     predictions_df = pd.read_csv(artifact_path+"onv_preds.csv")
 
