@@ -84,30 +84,31 @@ with whatif_tab1:
         for month_sequence in range(num_months):
             current_month = month_sequence+month_numeric
             month_name = next((k for k, v in month_dict.items() if v == current_month), None)
-            # st.write(f"For the Month of {month_name}")
-            # st.write("Input Data")
-            # test_df.values
-            test_df['Month'] = month_dict[month_name]
-            X_test = np.log(test_df.values + 1)  # Add 1 to avoid log(0)
-            prediction_log = model.predict(X_test)
-            predicted_onv = np.exp(prediction_log)  # Reverse log transformation
-    
-            st.success(f"Predicted Number of Overnight Visitors from {nationality_string}, for {month_name} {year}: {int(predicted_onv[0])}")
-            st.write(f"Prediction Input Data {month_name} {year}:\n")
-            test_df
-            explainer = shap.TreeExplainer(model)
-            shap_values = explainer(X_test)
-            
-            shap_values_obj = shap.Explanation(values=shap_values.values, base_values=shap_values.base_values, data=shap_values.data
-                                               , feature_names=feature_name_list
-                                              )
-    
-            # Display the waterfall plot for the first instance        
-            fig, ax = plt.subplots()
-            shap.waterfall_plot(shap_values_obj[0])
-            st.pyplot(fig)
-            st.header("", divider='red')
-            st.header("\n\n")            
+            if month_name != None:
+                # st.write(f"For the Month of {month_name}")
+                # st.write("Input Data")
+                # test_df.values
+                test_df['Month'] = month_dict[month_name]
+                X_test = np.log(test_df.values + 1)  # Add 1 to avoid log(0)
+                prediction_log = model.predict(X_test)
+                predicted_onv = np.exp(prediction_log)  # Reverse log transformation
+        
+                st.success(f"Predicted Number of Overnight Visitors from {nationality_string}, for {month_name} {year}: {int(predicted_onv[0])}")
+                st.write(f"Prediction Input Data {month_name} {year}:\n")
+                test_df
+                explainer = shap.TreeExplainer(model)
+                shap_values = explainer(X_test)
+                
+                shap_values_obj = shap.Explanation(values=shap_values.values, base_values=shap_values.base_values, data=shap_values.data
+                                                   , feature_names=feature_name_list
+                                                  )
+        
+                # Display the waterfall plot for the first instance        
+                fig, ax = plt.subplots()
+                shap.waterfall_plot(shap_values_obj[0])
+                st.pyplot(fig)
+                st.header("", divider='red')
+                st.header("\n\n")            
         
         
         
