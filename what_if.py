@@ -114,6 +114,7 @@ with whatif_tab1:
         
         
 with monthly_preds_tab2:
+    st.header("Model's Predictions")
     # Define the predictions DataFrame for demonstration purposes
     predictions_df = pd.read_csv(artifact_path+"onv_preds.csv")
 
@@ -149,6 +150,8 @@ with monthly_preds_tab2:
             f'<div><img src="data:image/png;base64,{img_base64}" class="img-magnify"></div>',
             unsafe_allow_html=True
         )
+
+    # Model related metrics on top of the view
     # col1, col2, col3 = st.columns(3) 
     # col1.metric("Metric-1", "82/100", "12%")
     # col2.metric("Metric-2", "0.9/1.0", "-0.02")
