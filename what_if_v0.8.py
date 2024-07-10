@@ -28,7 +28,7 @@ whatif_tab1, monthly_preds_tab2 = st.tabs(["What-If", "Monthly Predictions"])
 
 with whatif_tab1:
     # Display the logo at the top of the sidebar
-    st.sidebar.image("https://uaerg.ae/wp-content/uploads/2022/10/det-report-logos.png", width=250)
+    st.sidebar.image("https://d2csxpduxe849s.cloudfront.net/media/AD103F47-75FF-486A-85096BE8028DB0BC/C27311A5-51B6-422C-B928E785925AC8EA/webimage-4F35A22B-AD2F-4F9A-8EA5F82D2D295A8C.png", width=250)
     
     # Pre-filled random values for demonstration
     st.sidebar.header("Essential Statics", divider='red')
