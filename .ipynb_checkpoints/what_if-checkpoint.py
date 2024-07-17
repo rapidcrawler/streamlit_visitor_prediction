@@ -31,16 +31,16 @@ with whatif_tab1:
     st.sidebar.image("https://d2csxpduxe849s.cloudfront.net/media/AD103F47-75FF-486A-85096BE8028DB0BC/C27311A5-51B6-422C-B928E785925AC8EA/webimage-4F35A22B-AD2F-4F9A-8EA5F82D2D295A8C.png", width=250)
     
     # Pre-filled random values for demonstration
-    st.sidebar.header("Essential Statics", divider='red')
-    year = st.sidebar.selectbox('Year', list(range(dt.now().year, 2026)), index=1)
+    st.header("Essential Statics", divider='red')
+    year = st.selectbox('Year', list(range(dt.now().year, 2026)), index=1)
     
-    month = st.sidebar.selectbox('Month', [
+    month = st.selectbox('Month', [
         'January', 'February', 'March', 'April', 'May', 'June',
         'July', 'August', 'September', 'October', 'November', 'December'
     ], index=dt.now().month)
-    num_months = st.sidebar.slider('Number of Months to Predict', min_value=1, max_value=12, value=3, key="num_months_slider")    
+    num_months = st.slider('Number of Months to Predict', min_value=1, max_value=12, value=3, key="num_months_slider")    
     
-    nationality_string = st.sidebar.selectbox('Nationality', ['USA', 'UK', 'India', 'China', 'Germany'], index=1)
+    nationality_string = st.selectbox('Nationality', ['USA', 'UK', 'India', 'China', 'Germany'], index=1)
 
     # Encoding nationality as a numeric value
     nationality_dict = {'USA': 1, 'UK': 2, 'India': 3, 'China': 4, 'Germany': 5}
@@ -55,20 +55,20 @@ with whatif_tab1:
     month_numeric = month_dict[month]
     
     
-    st.sidebar.header("What-If Scenario Creators", divider='red')
+    st.header("What-If Scenario Creators", divider='red')
     # Input: Average ticket price for economy class
-    economy_ticket_price = st.sidebar.number_input('Average Economy Ticket Price', min_value=0, value=500)
+    economy_ticket_price = st.number_input('Average Economy Ticket Price', min_value=0, value=500)
     
     # Input: Average ticket price for business class
-    business_ticket_price = st.sidebar.number_input('Average Business Ticket Price', min_value=0, value=2000)
+    business_ticket_price = st.number_input('Average Business Ticket Price', min_value=0, value=2000)
 
-    avg_google_searches = st.sidebar.number_input('Average Google Searches In Previous Months', min_value=0, value=500)
+    avg_google_searches = st.number_input('Average Google Searches In Previous Months', min_value=0, value=500)
 
     # Input: Number of bookings in last 3 months, last 2 months, last month
-    bookings_last_3_months = st.sidebar.number_input('Number of Bookings in last 3 months', min_value=0, value=1000)
-    bookings_last_2_months = st.sidebar.number_input('Number of Bookings in last 2 months', min_value=0, value=800)
-    bookings_last_month = st.sidebar.number_input('Number of Bookings in last month', min_value=0, value=500)
-    gdp = st.sidebar.number_input('GDP Value ($BN)', min_value=0, value=50)
+    bookings_last_3_months = st.number_input('Number of Bookings in last 3 months', min_value=0, value=1000)
+    bookings_last_2_months = st.number_input('Number of Bookings in last 2 months', min_value=0, value=800)
+    bookings_last_month = st.number_input('Number of Bookings in last month', min_value=0, value=500)
+    gdp = st.number_input('GDP Value ($BN)', min_value=0, value=50)
 
     
     test_df = pd.DataFrame([year, month_numeric, nationality_encoded,economy_ticket_price, business_ticket_price, avg_google_searches, bookings_last_3_months, bookings_last_2_months, bookings_last_month, gdp]).T
@@ -78,7 +78,7 @@ with whatif_tab1:
     
     
     # Predict button
-    if st.sidebar.button('Predict'):
+    if st.button('Predict'):
         st.subheader("SHAP Waterfall Plot")
 
         for month_sequence in range(num_months):
